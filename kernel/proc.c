@@ -466,7 +466,7 @@ register struct proc *rp;	/* this process is no longer runnable */
    * process if it is found. A process can be made unready even if it is not
    * running by being sent a signal that kills it.
    */
-	if(isuserp(rp))
+	if(q == 15)
 	total_ticks = total_ticks - rp->p_tickets;
   prev_xp = NIL_PROC;
   for (xpp = &rdy_head[q]; *xpp != NIL_PROC; xpp = &(*xpp)->p_nextready) {
@@ -532,17 +532,10 @@ int *front;					/* return: front or back */
    * so that it can immediately run. The queue to use simply is always the
    * process' current priority.
    */
-	 if ( isuserp(rp) )
-	 {
-		 rp->priority = 15; /* set the priority of user process to 15*/
-		 *queue = rp->p_priority; /* return queue */
-		 *front = 0; /* always add new user process to the tail */
-	 }
-	 else
-	 {
-		 *queue = rp->p_priority;
-	   *front = time_left;
-	 }
+	 
+	 *queue = rp->p_priority;
+	 *front = time_left;
+	 
   }
 
 /*===========================================================================*
@@ -563,36 +556,30 @@ PRIVATE void pick_proc()
    */
   for (q=0; q < (NR_SCHED_QUEUES - 2); q++) {
       if ( (rp = rdy_head[q]) != NIL_PROC) {
+        if (q == 15)
+        {
+          int x;
+          x = rand() % total_ticks;
+          while (x > 0)
+          {
+            x = x - rp->p_tickets;
+            if (x <= 0)
+            {
+              next_ptr = rp;
+              if (priv(rp)->s_flag & BILLABLE)
+                bill_ptr = rp;
+              return;
+            }
+            rp = rp->p_nextready;
+          }
+        }
           next_ptr = rp;			/* run process 'rp' next */
           if (priv(rp)->s_flags & BILLABLE)
               bill_ptr = rp;			/* bill for system time */
           return;
       }
   }
-	/*=======================================================================*
-	*     Loterry scheduling for user proc *
-	*========================================================================*/
-	if ((rp = rdy_head[15]) != NIL_PROC)
-	{
-		int ticketnum = rand(total_ticks -1 )+1;
-		while (ticketnum > 0)
-		{
-			rp = rp->p_nextready;
-			ticketnum = ticketnum - rp->p_tickets;
-		}
-		next_ptr = rp;
-		bill_ptr = rp;
-		return;
-	}
-	else
-	/*======================================================================*
-	*      if all the queues are empty then run idle proc*
-	*========================================================================*/
-	{
-		next_ptr = rdy_head[16];
-		bill_ptr = rdy_head[16];
-		return;
-	}
+	
 }
 
 /*===========================================================================*

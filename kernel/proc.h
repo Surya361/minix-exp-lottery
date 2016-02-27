@@ -75,7 +75,7 @@ struct proc {
 #define NR_SCHED_QUEUES   17	/* MUST equal minimum priority + 1 */
 #define TASK_Q		   0	/* highest, used for kernel tasks */
 #define MAX_USER_Q  	   15    /* highest priority for user processes Update: All user process are queued in 15*/
-#define USER_Q  	   7    /* default (should correspond to nice 0) */
+#define USER_Q  	   15    /* default (should correspond to nice 0) */
 #define MIN_USER_Q	  15	/* minimum priority for user processes  Update: All user processes are queued in 15*/
 #define IDLE_Q		  16    /* lowest, only IDLE process goes here */
 
