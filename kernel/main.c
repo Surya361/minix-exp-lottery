@@ -127,6 +127,7 @@ PUBLIC void main()
 	if (isusern(proc_nr(rp))) {		/* user-space process? */ 
 		rp->p_reg.sp = (rp->p_memmap[S].mem_vir +
 				rp->p_memmap[S].mem_len) << CLICK_SHIFT;
+    rp->p_tickets = 10;
 		rp->p_reg.sp -= sizeof(reg_t);
 	}
 	
