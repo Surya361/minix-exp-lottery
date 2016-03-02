@@ -412,7 +412,7 @@ register struct proc *rp;	/* this process is now runnable */
   /* Determine where to insert to process. */
   sched(rp, &q, &front);
   if(q == 15)
-	total_ticks = total_ticks - p->p_tickets;
+	total_ticks = total_ticks + p->p_tickets;
   /* Now add the process to the queue. */
   if (rdy_head[q] == NIL_PROC) {		/* add to empty queue */
       rdy_head[q] = rdy_tail[q] = rp; 		/* create a new queue */
